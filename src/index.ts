@@ -13,6 +13,9 @@ const app = new Elysia()
   .get("/", () => "Hello Elysia")
   .post("/api/user/signin", UserController.signIn)
   .put("/api/user/update", UserController.update)
+  .get("/api/user/list", UserController.list)
+  .post("/api/user/create", UserController.create)
+  .put("/api/user/updateUser/:id", UserController.updateUser)
 
   //
   // device
