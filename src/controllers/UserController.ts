@@ -72,7 +72,19 @@ export const UserController = {
                 select: {
                     id: true,
                     username: true,
-                    level: true
+                    level: true,
+                    section: {
+                        select: {
+                            name: true,
+                            id: true,
+                            department: {
+                                select: {
+                                    name: true,
+                                    id: true
+                                }
+                            }
+                        }
+                    }
                 },
                 where: {
                     status: "active"
@@ -110,7 +122,7 @@ export const UserController = {
             username: string;
             password: string;
             level: string;
-            sectionId: string;
+            sectionId: number;
         },
         params: {
             id: string;
@@ -122,19 +134,17 @@ export const UserController = {
                 where: { id: parseInt(params.id) }
             })
 
-            if (body.password.trim().length > 0) {
-                const newData = {
-                    username: body.username,
-                    password: body.password == '' ? oldUser?.password : body.password,
-                    level: body.level,
-                    sectionId: body.sectionId
-                }
-
-                await prisma.user.update({
-                    where: { id: parseInt(params.id) },
-                    data: newData
-                })
+            const newData = {
+                username: body.username,
+                password: body.password == '' ? oldUser?.password : body.password,
+                level: body.level,
+                sectionId: body.sectionId
             }
+
+            await prisma.user.update({
+                where: { id: parseInt(params.id) },
+                data: newData
+            })
 
             return { message: "success" }
         } catch (error) {
