@@ -20,6 +20,8 @@ model User {
   level     String   @default("user") // user, admin, engineer
   createdAt DateTime @default(now())
   status    String   @default("active") // active, inactive
+  sectionId Int?
+  section   Section? @relation(fields: [sectionId], references: [id])
 }
 
 model Device {
@@ -31,4 +33,24 @@ model Device {
   remark     String?
   status     String   @default("active") // active, inactive
   createdAt  DateTime @default(now())
+}
+
+// แผนก
+model Department {
+  id        Int       @id @default(autoincrement())
+  name      String
+  status    String    @default("active") // active, inactive
+  createdAt DateTime  @default(now())
+  sections  Section[]
+}
+
+// ฝ่าย
+model Section {
+  id           Int        @id @default(autoincrement())
+  name         String
+  departmentId Int
+  department   Department @relation(fields: [departmentId], references: [id])
+  status       String     @default("active") // active, inactive
+  createdAt    DateTime   @default(now())
+  users        User[]
 }
