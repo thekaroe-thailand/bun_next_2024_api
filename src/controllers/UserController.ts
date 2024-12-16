@@ -104,7 +104,7 @@ export const UserController = {
             username: string;
             password: string;
             level: string;
-            sectionId: string;
+            sectionId: number;
         }
     }) => {
         try {
