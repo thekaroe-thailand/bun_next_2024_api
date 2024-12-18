@@ -32,6 +32,7 @@ export const RepairRecordController = {
             deviceSerial?: string;
             problem: string;
             solving?: string;
+            expireDate?: Date;
         },
         request: any,
         jwt: any
