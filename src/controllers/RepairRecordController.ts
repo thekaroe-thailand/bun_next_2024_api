@@ -14,7 +14,27 @@ export const RepairRecordController = {
                 }
             });
 
-            return repairRecords;
+            // ตรวจสอบว่า engineerId มีค่าไหม ถ้ามีค่าให้หา username ของ engineer มาเพิ่มใน list
+            let list = [];
+
+            for (const repairRecord of repairRecords) {
+                if (repairRecord.engineerId) {
+                    const engineer = await prisma.user.findUnique({
+                        select: {
+                            username: true
+                        },
+                        where: {
+                            id: repairRecord.engineerId
+                        }
+                    });
+
+                    list.push({ ...repairRecord, engineer });
+                } else {
+                    list.push(repairRecord);
+                }
+            }
+
+            return list;
         } catch (error) {
             return error;
         }
@@ -107,6 +127,29 @@ export const RepairRecordController = {
                     id: parseInt(params.id)
                 },
                 data: body
+            });
+
+            return { message: "success" };
+        } catch (error) {
+            return error;
+        }
+    },
+    receive: async ({ body }: {
+        body: {
+            amount: number;
+            id: number;
+        }
+    }) => {
+        try {
+            await prisma.repairRecord.update({
+                where: {
+                    id: body.id
+                },
+                data: {
+                    amount: body.amount,
+                    payDate: new Date(),
+                    status: "complete" // ลูกค้ามารับอุปกรณ์แล้ว
+                }
             });
 
             return { message: "success" };

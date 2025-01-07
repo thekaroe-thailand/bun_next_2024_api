@@ -31,6 +31,7 @@ export const UserController = {
 
             return { user, token };
         } catch (error) {
+            console.log(error);
             return error;
         }
     },
