@@ -1,5 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const dayjs = require('dayjs');
 
 export const RepairRecordController = {
     list: async () => {
@@ -181,6 +182,39 @@ export const RepairRecordController = {
             });
 
             return repairRecords;
+        } catch (error) {
+            return error;
+        }
+    },
+    dashboard: async () => {
+        try {
+            const totalRepairRecord = await prisma.repairRecord.count();
+            const totalRepairRecordComplete = await prisma.repairRecord.count({
+                where: {
+                    status: "complete"
+                }
+            });
+            const totalRepairRecordNotComplete = await prisma.repairRecord.count({
+                where: {
+                    status: {
+                        not: "complete"
+                    }
+                }
+            });
+            const totalAmount = await prisma.repairRecord.aggregate({
+                _sum: {
+                    amount: true
+                },
+                where: {
+                    status: "complete"
+                }
+            });
+            return {
+                totalRepairRecord: totalRepairRecord,
+                totalRepairRecordComplete: totalRepairRecordComplete,
+                totalRepairRecordNotComplete: totalRepairRecordNotComplete,
+                totalAmount: totalAmount._sum.amount
+            };
         } catch (error) {
             return error;
         }
