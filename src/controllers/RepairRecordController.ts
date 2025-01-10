@@ -186,8 +186,12 @@ export const RepairRecordController = {
             return error;
         }
     },
-    dashboard: async () => {
+    dashboard: async ({ query }: any) => {
         try {
+            // get year and month from query string
+            const year = parseInt(query.year);
+            const month = parseInt(query.month);
+
             const totalRepairRecord = await prisma.repairRecord.count();
             const totalRepairRecordComplete = await prisma.repairRecord.count({
                 where: {
@@ -209,11 +213,47 @@ export const RepairRecordController = {
                     status: "complete"
                 }
             });
+
+            //
+            // list for income per days
+            //
+            const listIncomePerDays = [];
+            const totalDaysInMonthAndYear = new Date(year, month, 0).getDate();
+
+            for (let i = 1; i <= totalDaysInMonthAndYear; i++) {
+                let startDate = new Date(year + '-' + month + '-' + i);
+                startDate.setHours(0, 0, 0, 0);
+
+                let endDate = new Date(year + '-' + month + '-' + i);
+                endDate.setHours(23, 59, 59, 999);
+
+                const totalIncome = await prisma.repairRecord.aggregate({
+                    _sum: {
+                        amount: true
+                    },
+                    where: {
+                        payDate: {
+                            gte: startDate,
+                            lte: endDate
+                        },
+                        status: "complete"
+                    }
+                });
+
+                console.log(startDate, endDate, totalIncome._sum.amount);
+
+                listIncomePerDays.push({
+                    date: i,
+                    amount: totalIncome._sum.amount ?? 0
+                });
+            }
+
             return {
                 totalRepairRecord: totalRepairRecord,
                 totalRepairRecordComplete: totalRepairRecordComplete,
                 totalRepairRecordNotComplete: totalRepairRecordNotComplete,
-                totalAmount: totalAmount._sum.amount
+                totalAmount: totalAmount._sum.amount,
+                listIncomePerDays: listIncomePerDays
             };
         } catch (error) {
             return error;

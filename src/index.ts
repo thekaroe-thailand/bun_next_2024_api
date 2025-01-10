@@ -8,6 +8,23 @@ import { SectionController } from "./controllers/SectionController";
 import { RepairRecordController } from "./controllers/RepairRecordController";
 import { CompanyController } from "./controllers/CompanyController";
 
+// middleware for check token
+const checkSignIn = async ({ jwt, request, set }: any) => {
+  const token = request.headers.get("Authorization")?.split(" ")[1]; // Bearer token "Bearer 38j838j838j838j838j838j8"
+
+  if (!token) {
+    set.status = 401;
+    return 'Unauthorized';
+  }
+
+  const payload = await jwt.verify(token, 'secret');
+
+  if (!payload) {
+    set.status = 401;
+    return 'Unauthorized';
+  }
+};
+
 const app = new Elysia()
   .use(cors())
   .use(jwt({
@@ -26,7 +43,7 @@ const app = new Elysia()
   //
   // company
   //
-  .get("/api/company/info", CompanyController.info)
+  .get("/api/company/info", CompanyController.info, { beforeHandle: checkSignIn }) // use middleware to check token
   .put("/api/company/update", CompanyController.update)
 
   //
