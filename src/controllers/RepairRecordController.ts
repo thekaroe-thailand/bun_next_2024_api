@@ -240,8 +240,6 @@ export const RepairRecordController = {
                     }
                 });
 
-                console.log(startDate, endDate, totalIncome._sum.amount);
-
                 listIncomePerDays.push({
                     date: i,
                     amount: totalIncome._sum.amount ?? 0
