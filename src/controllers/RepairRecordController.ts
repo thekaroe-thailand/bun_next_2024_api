@@ -256,5 +256,49 @@ export const RepairRecordController = {
         } catch (error) {
             return error;
         }
+    },
+    // 
+    // รายได้ รายเดือน
+    //
+    incomePerMonth: async ({ query }: {
+        query: {
+            year: string;
+        }
+    }) => {
+        try {
+            const year = parseInt(query.year);
+            let listIncomePerMonth = [];
+
+            for (let i = 1; i <= 12; i++) {
+                const totalDaysInMonth = dayjs(year + '-' + i + '-01').daysInMonth();
+                let startDate = new Date(year + '-' + i + '-01');
+                startDate.setHours(0, 0, 0, 0);
+
+                let endDate = new Date(year + '-' + i + '-' + totalDaysInMonth);
+                endDate.setHours(23, 59, 59, 999);
+
+                const totalIncome = await prisma.repairRecord.aggregate({
+                    _sum: {
+                        amount: true
+                    },
+                    where: {
+                        payDate: {
+                            gte: startDate,
+                            lte: endDate,
+                        },
+                        status: "complete"
+                    }
+                });
+
+                listIncomePerMonth.push({
+                    month: i,
+                    amount: totalIncome._sum.amount ?? 0
+                });
+            }
+
+            return listIncomePerMonth;
+        } catch (error) {
+            return error;
+        }
     }
 }

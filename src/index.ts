@@ -39,7 +39,7 @@ const app = new Elysia()
   .put("/api/user/updateUser/:id", UserController.updateUser)
   .delete("/api/user/remove/:id", UserController.remove)
   .get("/api/user/listEngineer", UserController.listEngineer)
-
+  .get("/api/user/level", UserController.level)
   //
   // company
   //
@@ -57,6 +57,7 @@ const app = new Elysia()
   .put("/api/repairRecord/receive", RepairRecordController.receive)
   .get('/api/income/report/:startDate/:endDate', RepairRecordController.report) // API แสดงรายรับตามช่วงวันที่
   .get('/api/repairRecord/dashboard', RepairRecordController.dashboard)
+  .get('/api/repairRecord/incomePerMonth', RepairRecordController.incomePerMonth)
 
   // 
   // department an section
